@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Orders - Warehouse System</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            background: #f4f4f4; 
+        }
+        .navbar { 
+            background: #333; 
+            color: white; 
+            padding: 10px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .navbar a { 
+            color: white; 
+            text-decoration: none; 
+            margin: 0 15px; 
+        }
+        .navbar a:hover { 
+            text-decoration: underline; 
+        }
+        .orders-container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.2); 
+            width: 600px; 
+            margin: 50px auto; 
+        }
+        .orders-container h2 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 20px; 
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        th, td { 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            text-align: center; 
+        }
+        th { 
+            background: #007bff; 
+            color: white; 
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div>
+            <a href="customer_profile.html">Profile</a>
+            <a href="customer_orders.html">Orders</a>
+            <a href="customer_cart.html">Cart</a>
+            <a href="customer_wishlist.html">Wishlist</a>
+            <a href="/FruitWarehouseSystem/logout">Logout</a>
+        </div>
+        <div>Welcome, Customer!</div>
+    </div>
+
+    <div class="orders-container">
+        <h2>Your Orders</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Fruit</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>ORD001</td>
+                    <td>Apple</td>
+                    <td>5 crates</td>
+                    <td>₹1250</td>
+                    <td>2025-05-01</td>
+                </tr>
+                <tr>
+                    <td>ORD002</td>
+                    <td>Orange</td>
+                    <td>3 crates</td>
+                    <td>₹900</td>
+                    <td>2025-05-02</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

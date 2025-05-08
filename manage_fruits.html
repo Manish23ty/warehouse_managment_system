@@ -1,0 +1,231 @@
+```html
+   <!DOCTYPE html>
+   <html lang="en">
+   <head>
+       <meta charset="UTF-8">
+       <title>Manage Fruits - Warehouse System</title>
+       <style>
+           body {
+               font-family: Arial, sans-serif;
+               margin: 0;
+               padding: 20px;
+               background: url('https://images.unsplash.com/photo-1610832958506-aa56368176cf') no-repeat center center fixed;
+               background-size: cover;
+           }
+           .container {
+               background: rgba(255, 255, 255, 0.9);
+               padding: 20px;
+               border-radius: 10px;
+               box-shadow: 0 0 15px rgba(0,0,0,0.2);
+               max-width: 1000px;
+               margin: 0 auto;
+           }
+           h2 {
+               text-align: center;
+               color: #333;
+           }
+           table {
+               width: 100%;
+               border-collapse: collapse;
+               margin: 20px 0;
+           }
+           th, td {
+               padding: 10px;
+               border: 1px solid #ccc;
+               text-align: left;
+           }
+           th {
+               background: #28a745;
+               color: white;
+           }
+           .form-group {
+               margin-bottom: 15px;
+           }
+           .form-group label {
+               display: block;
+               margin-bottom: 5px;
+           }
+           .form-group input, .form-group select {
+               width: 100%;
+               padding: 8px;
+               border: 1px solid #ccc;
+               border-radius: 5px;
+           }
+           button {
+               padding: 10px 20px;
+               background: #28a745;
+               color: white;
+               border: none;
+               border-radius: 5px;
+               cursor: pointer;
+           }
+           button:hover {
+               background: #218838;
+           }
+       </style>
+   </head>
+   <body>
+       <div class="container">
+           <h2>Manage Fruits</h2>
+
+           <!-- Form to Add/Update Fruit -->
+           <div class="form-group">
+               <label for="fruitId">Fruit ID (for update/delete)</label>
+               <input type="text" id="fruitId" placeholder="Leave blank to add new fruit">
+           </div>
+           <div class="form-group">
+               <label for="code">Unique Code (Auto-generated)</label>
+               <input type="text" id="code" readonly>
+           </div>
+           <div class="form-group">
+               <label for="name">Fruit Name</label>
+               <input type="text" id="name" placeholder="e.g., Mango" required>
+           </div>
+           <div class="form-group">
+               <label for="type">Fruit Type</label>
+               <input type="text" id="type" placeholder="e.g., Alphonso" required>
+           </div>
+           <div class="form-group">
+               <label for="pricePerCrate">Price per Crate</label>
+               <input type="number" step="0.01" id="pricePerCrate" placeholder="e.g., 500.00" required>
+           </div>
+           <div class="form-group">
+               <label for="imageUrl">Image URL</label>
+               <input type="text" id="imageUrl" placeholder="e.g., https://images.unsplash.com/..." required>
+           </div>
+           <div class="form-group">
+               <label for="staffId">Assign to Vendor</label>
+               <select id="staffId" required>
+                   <option value="">Select Vendor</option>
+               </select>
+           </div>
+           <button onclick="saveFruit()">Save Fruit</button>
+           <button onclick="deleteFruit()">Delete Fruit</button>
+
+           <!-- Table to Display Fruits -->
+           <table id="fruitTable">
+               <thead>
+                   <tr>
+                       <th>ID</th>
+                       <th>Code</th>
+                       <th>Name</th>
+                       <th>Type</th>
+                       <th>Price per Crate</th>
+                       <th>Image</th>
+                       <th>Vendor</th>
+                       <th>Created At</th>
+                   </tr>
+               </thead>
+               <tbody></tbody>
+           </table>
+       </div>
+
+       <script>
+           // Load fruits and vendors on page load
+           window.onload = function() {
+               fetchFruits();
+               fetchVendors();
+           };
+
+           function fetchVendors() {
+               fetch('/FruitWarehouseSystem/ManageFruitsServlet?action=getVendors')
+                   .then(response => response.json())
+                   .then(data => {
+                       const staffSelect = document.getElementById('staffId');
+                       data.forEach(staff => {
+                           const option = document.createElement('option');
+                           option.value = staff.id;
+                           option.text = staff.name;
+                           staffSelect.appendChild(option);
+                       });
+                   })
+                   .catch(error => alert('Error fetching vendors: ' + error.message));
+           }
+
+           function fetchFruits() {
+               fetch('/FruitWarehouseSystem/ManageFruitsServlet?action=list')
+                   .then(response => response.json())
+                   .then(data => {
+                       const tbody = document.querySelector('#fruitTable tbody');
+                       tbody.innerHTML = '';
+                       data.forEach(fruit => {
+                           const row = document.createElement('tr');
+                           row.innerHTML = `
+                               <td>${fruit.id}</td>
+                               <td>${fruit.code}</td>
+                               <td>${fruit.name}</td>
+                               <td>${fruit.type}</td>
+                               <td>${fruit.pricePerCrate}</td>
+                               <td><img src="${fruit.imageUrl}" alt="${fruit.name}" width="50"></td>
+                               <td>${fruit.staffName || 'Not Assigned'}</td>
+                               <td>${fruit.createdAt}</td>
+                           `;
+                           tbody.appendChild(row);
+                       });
+                   })
+                   .catch(error => alert('Error fetching fruits: ' + error.message));
+           }
+
+           function saveFruit() {
+               const fruitId = document.getElementById('fruitId').value;
+               const name = document.getElementById('name').value;
+               const type = document.getElementById('type').value;
+               const pricePerCrate = document.getElementById('pricePerCrate').value;
+               const imageUrl = document.getElementById('imageUrl').value;
+               const staffId = document.getElementById('staffId').value;
+
+               if (!name || !type || !pricePerCrate || !imageUrl || !staffId) {
+                   alert('Please fill in all required fields.');
+                   return;
+               }
+
+               const action = fruitId ? 'update' : 'add';
+               const body = `action=${action}&id=${fruitId}&name=${encodeURIComponent(name)}&type=${encodeURIComponent(type)}&pricePerCrate=${pricePerCrate}&imageUrl=${encodeURIComponent(imageUrl)}&staffId=${staffId}`;
+
+               fetch('/FruitWarehouseSystem/ManageFruitsServlet', {
+                   method: 'POST',
+                   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                   body: body
+               })
+               .then(response => response.text())
+               .then(data => {
+                   alert(data);
+                   fetchFruits();
+                   clearForm();
+               })
+               .catch(error => alert('Error saving fruit: ' + error.message));
+           }
+
+           function deleteFruit() {
+               const fruitId = document.getElementById('fruitId').value;
+               if (!fruitId) {
+                   alert('Please enter a Fruit ID to delete.');
+                   return;
+               }
+
+               fetch('/FruitWarehouseSystem/ManageFruitsServlet', {
+                   method: 'POST',
+                   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                   body: `action=delete&id=${fruitId}`
+               })
+               .then(response => response.text())
+               .then(data => {
+                   alert(data);
+                   fetchFruits();
+                   clearForm();
+               })
+               .catch(error => alert('Error deleting fruit: ' + error.message));
+           }
+
+           function clearForm() {
+               document.getElementById('fruitId').value = '';
+               document.getElementById('code').value = '';
+               document.getElementById('name').value = '';
+               document.getElementById('type').value = '';
+               document.getElementById('pricePerCrate').value = '';
+               document.getElementById('imageUrl').value = '';
+               document.getElementById('staffId').value = '';
+           }
+       </script>
+   </body>
+   </html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fruits - Warehouse System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: url('https://images.unsplash.com/photo-1610832958506-aa56368176cf') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .fruit-group {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .fruit-group h3 {
+            margin: 0 0 10px;
+            color: #28a745;
+        }
+        .fruit-card {
+            display: inline-block;
+            width: 220px;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .fruit-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .fruit-card p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Our Fruits</h2>
+        <div id="fruitsContainer"></div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            fetch('/FruitWarehouseSystem/ManageFruitsServlet?action=list')
+                .then(response => response.json())
+                .then(data => {
+                    const fruitsContainer = document.getElementById('fruitsContainer');
+                    // Group fruits by name
+                    const groupedFruits = {};
+                    data.forEach(fruit => {
+                        if (!groupedFruits[fruit.name]) {
+                            groupedFruits[fruit.name] = [];
+                        }
+                        groupedFruits[fruit.name].push(fruit);
+                    });
+
+                    // Display each fruit group
+                    for (const fruitName in groupedFruits) {
+                        const groupDiv = document.createElement('div');
+                        groupDiv.className = 'fruit-group';
+                        groupDiv.innerHTML = `<h3>${fruitName}</h3>`;
+                        groupedFruits[fruitName].forEach(fruit => {
+                            const cardDiv = document.createElement('div');
+                            cardDiv.className = 'fruit-card';
+                            cardDiv.innerHTML = `
+                                <img src="${fruit.imageUrl}" alt="${fruit.name}">
+                                <p>Type: ${fruit.type}</p>
+                                <p>Quantity: ${fruit.quantity}</p>
+                                <p>Price per Crate: ₹${fruit.pricePerCrate}</p>
+                                <p>Added: ${fruit.createdAt}</p>
+                            `;
+                            groupDiv.appendChild(cardDiv);
+                        });
+                        fruitsContainer.appendChild(groupDiv);
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('fruitsContainer').innerHTML = 'Error loading fruits: ' + error.message;
+                });
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Registration - Warehouse System</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            max-width: 400px;
+            width: 90%;
+            text-align: left;
+        }
+        .popup-content {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .close-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right;
+        }
+        .close-btn:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <img src="images/bg.jpg" alt="Background" class="background-image">
+        <div class="container">
+            <img src="images/regi.png" alt="Warehouse System Logo" class="logo">
+            <h1>Customer Registration</h1>
+            <p>Fill in your details to register</p>
+            <form id="registerForm" action="/FruitWarehouseSystem/RegisterServlet" method="POST" class="login-form">
+                <!-- Personal Details -->
+                <h3>Personal Details</h3>
+                <input type="text" id="name" name="name" placeholder="Full Name" required>
+                <input type="tel" id="mobile" name="mobile" placeholder="Mobile Number" required>
+                <input type="email" id="email" name="email" placeholder="Email ID" required>
+
+                <!-- Address Details -->
+                <h3>Address Details</h3>
+                <input type="text" id="storeName" name="storeName" placeholder="Store Name" required>
+                <input type="text" id="address" name="address" placeholder="Address" required>
+                <input type="text" id="pincode" name="pincode" placeholder="Pincode" required>
+                <input type="text" id="district" name="district" placeholder="District" required>
+                <input type="text" id="state" name="state" placeholder="State" required>
+
+                <!-- User ID and Password -->
+                <h3>Create User ID & Password</h3>
+                <input type="text" id="userId" name="userId" placeholder="User ID" required>
+                <input type="password" id="password" name="password" placeholder="Password" required>
+                <input type="password" id="password2" name="password2" placeholder="Re-enter Password" required>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="showPreview()">Preview</button>
+                    <button type="submit" class="btn btn-tertiary" onclick="return validateAndSubmit()">Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Popup for Preview -->
+    <div id="previewPopup" class="popup">
+        <button class="close-btn" onclick="closePopup()">Close</button>
+        <div class="popup-content">
+            <h3>Preview Your Details</h3>
+            <p><strong>Name:</strong> <span id="previewName"></span></p>
+            <p><strong>Mobile:</strong> <span id="previewMobile"></span></p>
+            <p><strong>Email:</strong> <span id="previewEmail"></span></p>
+            <p><strong>Store Name:</strong> <span id="previewStoreName"></span></p>
+            <p><strong>Address:</strong> <span id="previewAddress"></span></p>
+            <p><strong>Pincode:</strong> <span id="previewPincode"></span></p>
+            <p><strong>District:</strong> <span id="previewDistrict"></span></p>
+            <p><strong>State:</strong> <span id="previewState"></span></p>
+            <p><strong>User ID:</strong> <span id="previewUserId"></span></p>
+            <p><strong>Password:</strong> <span id="previewPassword"></span></p>
+        </div>
+    </div>
+
+    <script>
+        function showPreview() {
+            document.getElementById('previewName').textContent = document.getElementById('name').value || "Not filled";
+            document.getElementById('previewMobile').textContent = document.getElementById('mobile').value || "Not filled";
+            document.getElementById('previewEmail').textContent = document.getElementById('email').value || "Not filled";
+            document.getElementById('previewStoreName').textContent = document.getElementById('storeName').value || "Not filled";
+            document.getElementById('previewAddress').textContent = document.getElementById('address').value || "Not filled";
+            document.getElementById('previewPincode').textContent = document.getElementById('pincode').value || "Not filled";
+            document.getElementById('previewDistrict').textContent = document.getElementById('district').value || "Not filled";
+            document.getElementById('previewState').textContent = document.getElementById('state').value || "Not filled";
+            document.getElementById('previewUserId').textContent = document.getElementById('userId').value || "Not filled";
+            document.getElementById('previewPassword').textContent = document.getElementById('password').value || "Not filled";
+            document.getElementById('previewPopup').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('previewPopup').style.display = 'none';
+        }
+
+        function validateAndSubmit() {
+            const password = document.getElementById('password').value;
+            const password2 = document.getElementById('password2').value;
+
+            if (password !== password2) {
+                alert("Passwords do not match! Please try again.");
+                return false; // Prevent form submission
+            }
+            return true; // Allow form submission
+        }
+
+        // Close popup when clicking outside
+        window.onclick = function(event) {
+            const popup = document.getElementById('previewPopup');
+            if (event.target == popup) {
+                popup.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

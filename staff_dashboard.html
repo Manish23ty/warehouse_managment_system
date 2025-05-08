@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard - Warehouse System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navbar .brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .navbar .hamburger {
+            font-size: 24px;
+            cursor: pointer;
+            display: flex; /* Flexbox use kiya taaki icon aur fallback text align ho */
+            align-items: center;
+            gap: 8px; /* Icon aur text ke beech spacing */
+        }
+        .navbar .hamburger .fallback-text {
+            display: none; /* Font Awesome load ho toh yeh hide rahega */
+            font-size: 16px;
+            color: white;
+        }
+        .navbar .hamburger .fas.fa-bars {
+            display: inline-block;
+        }
+        .navbar .menu {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .menu a {
+            color: white;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+        .navbar .menu a:hover {
+            color: #3498db;
+        }
+        .navbar .hamburger-menu {
+            position: relative;
+        }
+        .navbar .dropdown {
+            display: none;
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: #34495e;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            min-width: 200px;
+            z-index: 1000;
+        }
+        .navbar .dropdown a {
+            display: block;
+            padding: 10px 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            border-bottom: 1px solid #2c3e50;
+        }
+        .navbar .dropdown a:last-child {
+            border-bottom: none;
+        }
+        .navbar .dropdown a:hover {
+            background: #3498db;
+        }
+        .container {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .search-bar input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+            font-size: 16px;
+        }
+        .search-bar button {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .search-bar button:hover {
+            background: #2980b9;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .section h3 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+            text-align: center;
+        }
+        .section input, .section select {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 10px auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .section button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .section button:hover {
+            background: #219653;
+        }
+        .list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .list-item {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .list-item:hover {
+            transform: translateY(-5px);
+        }
+        .list-item img {
+            max-width: 100px;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .list-item p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .list-item .actions {
+            margin-top: 10px;
+        }
+        .list-item button {
+            padding: 8px 15px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .list-item button.edit {
+            background: #3498db;
+            color: white;
+        }
+        .list-item button.edit:hover {
+            background: #2980b9;
+        }
+        .list-item button.delete {
+            background: #e74c3c;
+            color: white;
+        }
+        .list-item button.delete:hover {
+            background: #c0392b;
+        }
+        @media (max-width: 768px) {
+            .navbar .menu a {
+                display: none; /* Mobile view mein Profile, Fruits, Logout links hide honge */
+            }
+            .navbar .dropdown {
+                top: 50px;
+            }
+            .navbar .hamburger .fallback-text {
+                font-size: 14px; /* Mobile mein text size adjust */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="brand">Warehouse System</div>
+        <div class="menu">
+            <a href="#">Profile</a>
+            <a href="#">Fruits</a>
+            <a href="/FruitWarehouseSystem/LogoutServlet">Logout</a>
+            <div class="hamburger-menu">
+                <div class="hamburger" onclick="toggleMenu()">
+                    <i class="fas fa-bars"></i>
+                    <span class="fallback-text">[Menu]</span> <!-- Fallback agar icon load na ho -->
+                </div>
+                <div class="dropdown" id="dropdownMenu">
+                    <a href="#" onclick="showSection('addFruitSection')">Add New Fruits</a>
+                    <a href="#" onclick="showSection('fruitListSection')">My All Fruit List</a>
+                    <a href="#" onclick="showSection('customerSection')">Customer Information</a>
+                    <a href="#" onclick="showSection('vendorSection')">Vendor Information</a>
+                    <a href="#" onclick="showSection('orderSection')">Orders</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search Fruits by Name..." onkeyup="searchFruits()">
+            <button onclick="searchFruits()"><i class="fas fa-search"></i></button>
+        </div>
+
+        <!-- Add New Fruits Section -->
+        <div class="section" id="addFruitSection">
+            <h3>Add/Edit Fruit</h3>
+            <input type="hidden" id="fruitId" value="">
+            <input type="text" id="fruitName" placeholder="Fruit Name" required>
+            <input type="text" id="fruitType" placeholder="Fruit Type" required>
+            <input type="number" id="fruitPrice" placeholder="Price per Crate" step="0.01" required>
+            <input type="file" id="fruitImage" accept="image/*" required>
+            <input type="hidden" id="existingImageUrl" value="">
+            <select id="vendorId" required>
+                <option value="" disabled selected>Select Vendor</option>
+            </select>
+            <button onclick="addOrUpdateFruit()">Save</button>
+        </div>
+
+        <!-- My All Fruit List Section -->
+        <div class="section active" id="fruitListSection">
+            <h3>My All Fruit List</h3>
+            <div class="list" id="fruitList">
+                <!-- Fruits will be populated via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Customer Information Section -->
+        <div class="section" id="customerSection">
+            <h3>Customer Information</h3>
+            <div class="list" id="customerList">
+                <!-- Customers will be populated via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Vendor Information Section -->
+        <div class="section" id="vendorSection">
+            <h3>Vendor Information</h3>
+            <div class="list" id="vendorList">
+                <!-- Vendors will be populated via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Orders Section -->
+        <div class="section" id="orderSection">
+            <h3>Orders</h3>
+            <div class="list" id="orderList">
+                <!-- Orders will be populated via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            fetchVendors();
+            fetchFruits();
+            fetchCustomers();
+            fetchVendorsForList();
+            fetchOrders();
+            // Font Awesome load check
+            if (typeof window.FontAwesome === 'undefined') {
+                console.error('Font Awesome failed to load. Showing fallback text.');
+                document.querySelectorAll('.hamburger .fallback-text').forEach(el => {
+                    el.style.display = 'inline-block';
+                });
+                document.querySelectorAll('.hamburger .fas.fa-bars').forEach(el => {
+                    el.style.display = 'none';
+                });
+            } else {
+                console.log('Font Awesome loaded successfully.');
+            }
+        };
+
+        function toggleMenu() {
+            console.log('Toggling menu...'); // Debug log
+            const dropdown = document.getElementById('dropdownMenu');
+            const isVisible = dropdown.style.display === 'block';
+            dropdown.style.display = isVisible ? 'none' : 'block';
+            console.log('Menu visibility:', dropdown.style.display); // Debug log
+        }
+
+        function showSection(sectionId) {
+            console.log('Showing section:', sectionId); // Debug log
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            toggleMenu();
+        }
+
+        function fetchVendors() {
+            fetch('/FruitWarehouseSystem/ManageFruitsServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=getVendors'
+            })
+            .then(response => response.json())
+            .then(data => {
+                const vendorSelect = document.getElementById('vendorId');
+                vendorSelect.innerHTML = '<option value="" disabled selected>Select Vendor</option>';
+                data.forEach(vendor => {
+                    const option = document.createElement('option');
+                    option.value = vendor.id;
+                    option.textContent = vendor.name;
+                    vendorSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching vendors:', error);
+                alert('Error fetching vendors: ' + error.message);
+            });
+        }
+
+        let allFruits = [];
+        function fetchFruits() {
+            fetch('/FruitWarehouseSystem/ManageFruitsServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=list'
+            })
+            .then(response => response.json())
+            .then(data => {
+                allFruits = data;
+                displayFruits(data);
+            })
+            .catch(error => {
+                console.error('Error fetching fruits:', error);
+                alert('Error fetching fruits: ' + error.message);
+            });
+        }
+
+        function displayFruits(fruits) {
+            const fruitList = document.getElementById('fruitList');
+            fruitList.innerHTML = '';
+            fruits.forEach(fruit => {
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <img src="/FruitWarehouseSystem${fruit.imageUrl}" alt="${fruit.name}" onerror="this.src='https://via.placeholder.com/100';">
+                    <p><strong>${fruit.name} (${fruit.type})</strong></p>
+                    <p>Code: ${fruit.code}</p>
+                    <p>Price: ₹${fruit.pricePerCrate}/crate</p>
+                    <p>Quantity: ${fruit.quantity} crates</p>
+                    <p>Managed by: ${fruit.staffName || 'Unassigned'}</p>
+                    <div class="actions">
+                        <button class="edit" onclick="editFruit(${fruit.id}, '${fruit.name}', '${fruit.type}', ${fruit.pricePerCrate}, '${fruit.imageUrl}', ${fruit.staffId})">Edit</button>
+                        <button class="delete" onclick="deleteFruit(${fruit.id})">Delete</button>
+                    </div>
+                `;
+                fruitList.appendChild(item);
+            });
+        }
+
+        function searchFruits() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredFruits = allFruits.filter(fruit => 
+                fruit.name.toLowerCase().includes(searchTerm)
+            );
+            displayFruits(filteredFruits);
+        }
+
+        function addOrUpdateFruit() {
+            const fruitId = document.getElementById('fruitId').value;
+            const fruitName = document.getElementById('fruitName').value;
+            const fruitType = document.getElementById('fruitType').value;
+            const fruitPrice = document.getElementById('fruitPrice').value;
+            const fruitImage = document.getElementById('fruitImage').files[0];
+            const existingImageUrl = document.getElementById('existingImageUrl').value;
+            const staffId = document.getElementById('vendorId').value;
+
+            if (!fruitName || !fruitType || !fruitPrice || !staffId) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            if (!fruitId && !fruitImage) {
+                alert("Please upload an image for a new fruit.");
+                return;
+            }
+
+            const action = fruitId ? 'update' : 'add';
+            const formData = new FormData();
+            formData.append('action', action);
+            formData.append('id', fruitId);
+            formData.append('name', fruitName);
+            formData.append('type', fruitType);
+            formData.append('pricePerCrate', fruitPrice);
+            formData.append('staffId', staffId);
+            if (fruitImage) {
+                formData.append('imageFile', fruitImage);
+            }
+            if (existingImageUrl) {
+                formData.append('existingImageUrl', existingImageUrl);
+            }
+
+            fetch('/FruitWarehouseSystem/ManageFruitsServlet', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                fetchFruits();
+                resetForm();
+                showSection('fruitListSection');
+            })
+            .catch(error => {
+                console.error('Error saving fruit:', error);
+                alert('Error saving fruit: ' + error.message);
+            });
+        }
+
+        function editFruit(id, name, type, price, image, staffId) {
+            document.getElementById('fruitId').value = id;
+            document.getElementById('fruitName').value = name;
+            document.getElementById('fruitType').value = type;
+            document.getElementById('fruitPrice').value = price;
+            document.getElementById('existingImageUrl').value = image;
+            document.getElementById('vendorId').value = staffId || '';
+            document.getElementById('fruitImage').required = false;
+            showSection('addFruitSection');
+        }
+
+        function deleteFruit(id) {
+            if (confirm('Are you sure you want to delete this fruit?')) {
+                fetch('/FruitWarehouseSystem/ManageFruitsServlet', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `action=delete&id=${id}`
+                })
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                    fetchFruits();
+                })
+                .catch(error => {
+                    console.error('Error deleting fruit:', error);
+                    alert('Error deleting fruit: ' + error.message);
+                });
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('fruitId').value = '';
+            document.getElementById('fruitName').value = '';
+            document.getElementById('fruitType').value = '';
+            document.getElementById('fruitPrice').value = '';
+            document.getElementById('fruitImage').value = '';
+            document.getElementById('existingImageUrl').value = '';
+            document.getElementById('vendorId').value = '';
+            document.getElementById('fruitImage').required = true;
+        }
+
+        function fetchCustomers() {
+            fetch('/FruitWarehouseSystem/CustomerServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=list'
+            })
+            .then(response => response.json())
+            .then(data => {
+                const customerList = document.getElementById('customerList');
+                customerList.innerHTML = '';
+                data.forEach(customer => {
+                    const item = document.createElement('div');
+                    item.className = 'list-item';
+                    item.innerHTML = `
+                        <p><strong>${customer.name}</strong></p>
+                        <p>Email: ${customer.email}</p>
+                        <p>Phone: ${customer.phone}</p>
+                        <p>Address: ${customer.address}</p>
+                    `;
+                    customerList.appendChild(item);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching customers:', error);
+                document.getElementById('customerList').innerHTML = '<p>Error loading customers.</p>';
+            });
+        }
+
+        function fetchVendorsForList() {
+            fetch('/FruitWarehouseSystem/ManageFruitsServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=getVendors'
+            })
+            .then(response => response.json())
+            .then(data => {
+                const vendorList = document.getElementById('vendorList');
+                vendorList.innerHTML = '';
+                data.forEach(vendor => {
+                    const item = document.createElement('div');
+                    item.className = 'list-item';
+                    item.innerHTML = `
+                        <p><strong>${vendor.name}</strong></p>
+                        <p>ID: ${vendor.id}</p>
+                    `;
+                    vendorList.appendChild(item);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching vendors:', error);
+                document.getElementById('vendorList').innerHTML = '<p>Error loading vendors.</p>';
+            });
+        }
+
+        function fetchOrders() {
+            fetch('/FruitWarehouseSystem/OrderServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=list'
+            })
+            .then(response => response.json())
+            .then(data => {
+                const orderList = document.getElementById('orderList');
+                orderList.innerHTML = '';
+                data.forEach(order => {
+                    const item = document.createElement('div');
+                    item.className = 'list-item';
+                    item.innerHTML = `
+                        <p><strong>Order ID: ${order.id}</strong></p>
+                        <p>Customer ID: ${order.customerId}</p>
+                        <p>Fruit ID: ${order.fruitId}</p>
+                        <p>Quantity: ${order.quantity}</p>
+                        <p>Total Price: ₹${order.totalPrice}</p>
+                        <p>Date: ${order.orderDate}</p>
+                    `;
+                    orderList.appendChild(item);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching orders:', error);
+                document.getElementById('orderList').innerHTML = '<p>Error loading orders.</p>';
+            });
+        }
+    </script>
+</body>
+</html>

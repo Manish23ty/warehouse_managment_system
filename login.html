@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Warehouse System</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            background: url('https://images.unsplash.com/photo-1610832958506-aa56368176cf?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center fixed; 
+            background-size: cover; 
+        }
+        .login-container { 
+            background: rgba(255, 255, 255, 0.9); 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.2); 
+            width: 350px; 
+            position: relative; 
+            backdrop-filter: blur(5px); 
+        }
+        .login-container img { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            width: 40px; 
+        }
+        .login-container .warehouse-text { 
+            position: absolute; 
+            top: 15px; 
+            right: 60px; 
+            font-size: 16px; 
+            color: #444; 
+            font-weight: bold; 
+        }
+        .login-container h2 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 20px; 
+        }
+        .login-container input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            box-sizing: border-box; 
+        }
+        .login-container button { 
+            width: 100%; 
+            padding: 12px; 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            transition: background 0.3s; 
+        }
+        .login-container button:hover { 
+            background: #218838; 
+        }
+        .login-container .links { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin-top: 15px; 
+        }
+        .login-container a { 
+            color: #007bff; 
+            text-decoration: none; 
+            font-size: 14px; 
+            margin: 5px 0; 
+        }
+        .login-container a:hover { 
+            text-decoration: underline; 
+            color: #0056b3; 
+        }
+        .popup { 
+            display: none; 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.2); 
+            backdrop-filter: blur(5px); 
+        }
+        .popup input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            box-sizing: border-box; 
+        }
+        .popup button { 
+            width: 100%; 
+            padding: 12px; 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            transition: background 0.3s; 
+        }
+        .popup button:hover { 
+            background: #218838; 
+        }
+        .popup .close-btn { 
+            background: #dc3545; 
+            margin-top: 10px; 
+        }
+        .popup .close-btn:hover { 
+            background: #c82333; 
+        }
+        .popup h3 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 20px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="images/logo1.png" alt="Logo">
+        <span class="warehouse-text">warehouse</span>
+        <h2>Customer Login</h2>
+        <input type="text" id="userId" placeholder="User ID" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button onclick="login()">Login</button>
+        <div class="links">
+            <a href="register.html">Register Customer</a>
+            <a href="#" onclick="showForgetUserId()">Forget User ID?</a>
+            <a href="#" onclick="showForgetPassword()">Forget Password?</a>
+        </div>
+    </div>
+
+    <div class="popup" id="forgetPasswordPopup">
+        <h3>Forget Password</h3>
+        <input type="text" id="forgetUserId" placeholder="User ID" required>
+        <input type="text" id="forgetMobile" placeholder="Mobile Number" required>
+        <button onclick="forgetPassword()">Submit</button>
+        <button class="close-btn" onclick="closePopup('forgetPasswordPopup')">Close</button>
+    </div>
+
+    <div class="popup" id="newPasswordPopup" style="display: none;">
+        <h3>Update Password</h3>
+        <input type="password" id="newPassword" placeholder="New Password" required>
+        <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+        <button onclick="updatePassword()">Update</button>
+        <button class="close-btn" onclick="closePopup('newPasswordPopup')">Close</button>
+    </div>
+
+    <script>
+        function showForgetPassword() {
+            document.getElementById('forgetPasswordPopup').style.display = 'block';
+        }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).style.display = 'none';
+        }
+
+        function forgetPassword() {
+            const userId = document.getElementById('forgetUserId').value;
+            const mobile = document.getElementById('forgetMobile').value;
+
+            console.log('Attempting ForgetPassword for:', { userId, mobile });
+
+            fetch('/FruitWarehouseSystem/ForgetPasswordServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `userId=${encodeURIComponent(userId)}&mobile=${encodeURIComponent(mobile)}`
+            })
+            .then(response => {
+                console.log('ForgetPassword Response Status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log('ForgetPassword Raw Response:', data);
+                const trimmedData = data.trim();
+                console.log('ForgetPassword Trimmed Response:', trimmedData);
+                if (trimmedData === "Match found") {
+                    console.log('Match found, showing Update Password popup');
+                    document.getElementById('forgetPasswordPopup').style.display = 'none';
+                    document.getElementById('newPasswordPopup').style.display = 'block';
+                } else {
+                    alert(trimmedData);
+                }
+            })
+            .catch(error => {
+                console.error('Error in ForgetPassword:', error);
+                alert('Error in Forget Password: ' + error.message);
+            });
+        }
+
+        function updatePassword() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const userId = document.getElementById('forgetUserId').value;
+
+            if (newPassword !== confirmPassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            console.log('Attempting UpdatePassword for:', { userId, newPassword });
+
+            fetch('/FruitWarehouseSystem/UpdatePasswordServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `userId=${encodeURIComponent(userId)}&newPassword=${encodeURIComponent(newPassword)}`
+            })
+            .then(response => {
+                console.log('UpdatePassword Response Status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log('UpdatePassword Response:', data);
+                alert(data);
+                document.getElementById('newPasswordPopup').style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error in UpdatePassword:', error);
+                alert('Error in Update Password: ' + error.message);
+            });
+        }
+
+        function login() {
+            const userId = document.getElementById('userId').value;
+            const password = document.getElementById('password').value;
+
+            fetch('/FruitWarehouseSystem/LoginServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `userId=${encodeURIComponent(userId)}&password=${encodeURIComponent(password)}`
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data === "") {
+                    // Redirect happens on server-side
+                } else {
+                    alert(data);
+                }
+            })
+            .catch(error => {
+                console.error('Error in Login:', error);
+                alert('Error: ' + error.message);
+            });
+        }
+
+        function showForgetUserId() {
+            alert("Please contact support to retrieve your User ID.");
+        }
+    </script>
+</body>
+</html>

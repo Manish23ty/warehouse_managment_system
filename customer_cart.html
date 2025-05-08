@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Cart - Warehouse System</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            background: #f4f4f4; 
+        }
+        .navbar { 
+            background: #333; 
+            color: white; 
+            padding: 10px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .navbar a { 
+            color: white; 
+            text-decoration: none; 
+            margin: 0 15px; 
+        }
+        .navbar a:hover { 
+            text-decoration: underline; 
+        }
+        .cart-container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.2); 
+            width: 600px; 
+            margin: 50px auto; 
+        }
+        .cart-container h2 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 20px; 
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        th, td { 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            text-align: center; 
+        }
+        th { 
+            background: #007bff; 
+            color: white; 
+        }
+        .checkout-btn { 
+            display: block; 
+            width: 150px; 
+            padding: 10px; 
+            margin: 20px auto; 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            text-align: center; 
+            text-decoration: none; 
+        }
+        .checkout-btn:hover { 
+            background: #218838; 
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div>
+            <a href="customer_profile.html">Profile</a>
+            <a href="customer_orders.html">Orders</a>
+            <a href="customer_cart.html">Cart</a>
+            <a href="customer_wishlist.html">Wishlist</a>
+            <a href="/FruitWarehouseSystem/logout">Logout</a>
+        </div>
+        <div>Welcome, Customer!</div>
+    </div>
+
+    <div class="cart-container">
+        <h2>Your Cart</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Fruit</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Apple</td>
+                    <td>2 crates</td>
+                    <td>₹250/crate</td>
+                    <td>₹500</td>
+                </tr>
+                <tr>
+                    <td>Banana</td>
+                    <td>1 crate</td>
+                    <td>₹180/crate</td>
+                    <td>₹180</td>
+                </tr>
+            </tbody>
+        </table>
+        <a href="#" class="checkout-btn" onclick="alert('Checkout functionality coming soon!')">Checkout</a>
+    </div>
+</body>
+</html>

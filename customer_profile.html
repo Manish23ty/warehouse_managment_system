@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Profile - Warehouse System</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            background: #f4f4f4; 
+        }
+        .navbar { 
+            background: #333; 
+            color: white; 
+            padding: 10px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .navbar a { 
+            color: white; 
+            text-decoration: none; 
+            margin: 0 15px; 
+        }
+        .navbar a:hover { 
+            text-decoration: underline; 
+        }
+        .profile-container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.2); 
+            width: 500px; 
+            margin: 50px auto; 
+            text-align: center; 
+        }
+        .profile-container h2 { 
+            color: #333; 
+            margin-bottom: 20px; 
+        }
+        .profile-container p { 
+            font-size: 16px; 
+            margin: 10px 0; 
+        }
+        .profile-container button { 
+            padding: 10px 20px; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+        .profile-container button:hover { 
+            background: #0056b3; 
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div>
+            <a href="customer_profile.html">Profile</a>
+            <a href="customer_orders.html">Orders</a>
+            <a href="customer_cart.html">Cart</a>
+            <a href="customer_wishlist.html">Wishlist</a>
+            <a href="/FruitWarehouseSystem/logout">Logout</a>
+        </div>
+        <div>Welcome, Customer!</div>
+    </div>
+
+    <div class="profile-container">
+        <h2>Customer Profile</h2>
+        <p><strong>Name:</strong> Manish Sharma</p>
+        <p><strong>User ID:</strong> ms</p>
+        <p><strong>Email:</strong> manish.jsharma702@gmail.com</p>
+        <p><strong>Mobile:</strong> 6262777322</p>
+        <button onclick="alert('Edit functionality coming soon!')">Edit Profile</button>
+    </div>
+</body>
+</html>

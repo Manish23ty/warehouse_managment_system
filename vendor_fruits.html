@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vendor Dashboard - Warehouse System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; }
+        .navbar { background: #333; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar a { color: white; text-decoration: none; margin: 0 15px; }
+        .navbar a:hover { text-decoration: underline; }
+        .fruit-list { padding: 20px; }
+        .fruit-item { background: white; border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .fruit-item img { max-width: 100px; height: auto; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div>
+            <a href="#">Profile</a>
+            <a href="#">Fruits</a>
+            <a href="/FruitWarehouseSystem/LogoutServlet">Logout</a>
+        </div>
+        <div>Welcome, Vendor!</div>
+    </div>
+
+    <div class="fruit-list" id="fruitList">
+        <!-- Fruits will be populated via JavaScript -->
+    </div>
+
+    <script>
+        fetch('/FruitWarehouseSystem/GetStaffIdServlet')
+            .then(response => response.text())
+            .then(staffId => {
+                if (!staffId || staffId.trim() === "") {
+                    alert("Vendor ID not found. Please login again.");
+                    window.location.href = "vendor_login.html";
+                    return;
+                }
+                sessionStorage.setItem('staffId', staffId);
+                fetchFruits(staffId);
+            })
+            .catch(error => {
+                console.error('Error fetching staffId:', error);
+                alert("Error fetching vendor ID. Please login again.");
+                window.location.href = "vendor_login.html";
+            });
+
+        function fetchFruits(staffId) {
+            fetch('/FruitWarehouseSystem/ManageFruitsServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=list&staffId=${encodeURIComponent(staffId)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                const fruitList = document.getElementById('fruitList');
+                fruitList.innerHTML = '';
+                if (data.length === 0) {
+                    fruitList.innerHTML = '<p>No fruits assigned to you.</p>';
+                    return;
+                }
+                data.forEach(fruit => {
+                    const item = document.createElement('div');
+                    item.className = 'fruit-item';
+                    item.innerHTML = `
+                        <div>
+                            <img src="${fruit.imageUrl}" alt="${fruit.name}">
+                            <p><strong>${fruit.name} (${fruit.type})</strong></p>
+                            <p>Code: ${fruit.code}</p>
+                            <p>Price: ₹${fruit.pricePerCrate}/crate</p>
+                            <p>Quantity: <input type="number" value="${fruit.quantity}" id="quantity-${fruit.id}" min="0"> 
+                            <button onclick="updateQuantity(${fruit.id}, ${staffId})">Update Quantity</button></p>
+                        </div>
+                    `;
+                    fruitList.appendChild(item);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching fruits:', error);
+                document.getElementById('fruitList').innerHTML = '<p>Error loading fruits.</p>';
+            });
+        }
+
+        function updateQuantity(fruitId, staffId) {
+            const quantity = document.getElementById(`quantity-${fruitId}`).value;
+            fetch('/FruitWarehouseSystem/ManageFruitsServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=updateQuantity&id=${fruitId}&quantity=${quantity}&staffId=${staffId}`
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                fetchFruits(staffId);
+            })
+            .catch(error => {
+                console.error('Error updating quantity:', error);
+            });
+        }
+    </script>
+</body>
+</html>

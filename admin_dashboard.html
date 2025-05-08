@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Warehouse System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; }
+        .navbar { background: #333; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar a { color: white; text-decoration: none; margin: 0 15px; }
+        .navbar a:hover { text-decoration: underline; }
+        .container { padding: 20px; }
+        .section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .section h2 { margin-top: 0; }
+        .fruit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .fruit-card { border: 1px solid #ddd; padding: 10px; text-align: center; border-radius: 5px; }
+        .fruit-card img { max-width: 100%; height: 150px; object-fit: cover; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+        th { background: #007bff; color: white; }
+        button { padding: 5px 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #218838; }
+        select { padding: 5px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div>
+            <a href="admin_dashboard.html">Dashboard</a>
+            <a href="/FruitWarehouseSystem/logout">Logout</a>
+        </div>
+        <div id="welcomeMessage">Welcome, Admin!</div>
+    </div>
+
+    <div class="container">
+        <!-- Fruits Management Section (Categorized by Vendor) -->
+        <div class="section" id="fruitsSection">
+            <h2>Manage Fruits (Vendor-Wise)</h2>
+            <div id="fruitVendors"></div>
+        </div>
+
+        <!-- Customer Orders Section -->
+        <div class="section">
+            <h2>Customer Orders</h2>
+            <table id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Fruit</th>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Vendor Section -->
+        <div class="section">
+            <h2>Vendor Details</h2>
+            <table id="vendorsTable">
+                <thead>
+                    <tr>
+                        <th>Vendor ID</th>
+                        <th>Name</th>
+                        <th>Contact</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Customer Information Section -->
+        <div class="section">
+            <h2>Customer Information</h2>
+            <p>Total Registered Customers: <span id="totalCustomers">0</span></p>
+            <table id="customersTable">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Fetch Admin Details
+        fetch('/FruitWarehouseSystem/GetStaffDetailsServlet')
+            .then(response => response.json())
+            .then(data => {
+                if (data.name) {
+                    document.getElementById('welcomeMessage').textContent = `Welcome, ${data.name}!`;
+                }
+            })
+            .catch(error => console.error('Error fetching admin details:', error));
+
+        // Fetch and Categorize Fruits by Vendor
+        fetch('/FruitWarehouseSystem/GetFruitsServlet')
+            .then(response => response.json())
+            .then(data => {
+                const vendors = {};
+                data.forEach(fruit => {
+                    const vendor = fruit.vendor || 'Unassigned';
+                    if (!vendors[vendor]) {
+                        vendors[vendor] = [];
+                    }
+                    vendors[vendor].push(fruit);
+                });
+
+                const fruitVendors = document.getElementById('fruitVendors');
+                for (const vendor in vendors) {
+                    const vendorDiv = document.createElement('div');
+                    vendorDiv.innerHTML = `<h3>${vendor}</h3>`;
+                    const grid = document.createElement('div');
+                    grid.className = 'fruit-grid';
+                    vendors[vendor].forEach(fruit => {
+                        const card = document.createElement('div');
+                        card.className = 'fruit-card';
+                        card.innerHTML = `
+                            <img src="${fruit.image_url}" alt="${fruit.name}">
+                            <h4>${fruit.name} (${fruit.type})</h4>
+                            <p>Code: ${fruit.code}</p>
+                            <p>Quantity: ${fruit.quantity} crates</p>
+                            <p>Price: ₹${fruit.price_per_crate}/crate</p>
+                            <select onchange="updateVendor('${fruit.code}', this.value)">
+                                <option value="${vendor}" selected>${vendor}</option>
+                                <option value="vendor_north">North Vendor</option>
+                                <option value="vendor_south">South Vendor</option>
+                                <option value="vendor_east">East Vendor</option>
+                                <option value="vendor_west">West Vendor</option>
+                                <option value="Unassigned">Unassigned</option>
+                            </select>
+                            <button onclick="updateFruit('${fruit.code}')">Update Details</button>
+                        `;
+                        grid.appendChild(card);
+                    });
+                    vendorDiv.appendChild(grid);
+                    fruitVendors.appendChild(vendorDiv);
+                }
+            })
+            .catch(error => console.error('Error fetching fruits:', error));
+
+        // Fetch Customer Orders (Placeholder Data)
+        const orders = [
+            { id: 'ORD001', customer: 'Manish Sharma', fruit: 'Apple', quantity: '5 crates', total: '₹1250' },
+            { id: 'ORD002', customer: 'Rahul Verma', fruit: 'Orange', quantity: '3 crates', total: '₹900' }
+        ];
+        const ordersTableBody = document.querySelector('#ordersTable tbody');
+        orders.forEach(order => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${order.id}</td>
+                <td>${order.customer}</td>
+                <td>${order.fruit}</td>
+                <td>${order.quantity}</td>
+                <td>${order.total}</td>
+            `;
+            ordersTableBody.appendChild(row);
+        });
+
+        // Fetch Vendor Details
+        const vendors = [
+            { id: 'vendor_north', name: 'North Vendor', contact: '+91 9876543211' },
+            { id: 'vendor_south', name: 'South Vendor', contact: '+91 9876543212' },
+            { id: 'vendor_east', name: 'East Vendor', contact: '+91 9876543213' },
+            { id: 'vendor_west', name: 'West Vendor', contact: '+91 9876543214' }
+        ];
+        const vendorsTableBody = document.querySelector('#vendorsTable tbody');
+        vendors.forEach(vendor => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${vendor.id}</td>
+                <td>${vendor.name}</td>
+                <td>${vendor.contact}</td>
+            `;
+            vendorsTableBody.appendChild(row);
+        });
+
+        // Fetch Customer Information
+        fetch('/FruitWarehouseSystem/GetCustomersServlet')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('totalCustomers').textContent = data.length;
+                const customersTableBody = document.querySelector('#customersTable tbody');
+                data.forEach(customer => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${customer.user_id}</td>
+                        <td>${customer.name}</td>
+                        <td>${customer.email}</td>
+                        <td>${customer.mobile}</td>
+                    `;
+                    customersTableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching customers:', error));
+
+        function updateFruit(code) {
+            alert(`Update functionality for fruit code ${code} coming soon!`);
+        }
+
+        function updateVendor(code, vendor) {
+            fetch('/FruitWarehouseSystem/UpdateFruitVendorServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `code=${encodeURIComponent(code)}&vendor=${encodeURIComponent(vendor)}`
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                location.reload(); // Refresh to reflect changes
+            })
+            .catch(error => {
+                console.error('Error updating vendor:', error);
+                alert('Error updating vendor: ' + error.message);
+            });
+        }
+    </script>
+</body>
+</html>
